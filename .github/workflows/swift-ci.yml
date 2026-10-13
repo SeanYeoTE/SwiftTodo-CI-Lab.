@@ -19,7 +19,7 @@ jobs:
         run: |
           xcodebuild build-for-testing \
             -project TodoList.xcodeproj \
-            -scheme  TodoList \
+            -scheme TodoList \
             -destination 'platform=iOS Simulator,name=iPhone 17,OS=26.5' \
             CODE_SIGNING_ALLOWED=NO
 
@@ -30,3 +30,33 @@ jobs:
             -scheme TodoList \
             -destination 'platform=iOS Simulator,name=iPhone 17,OS=26.5' \
             CODE_SIGNING_ALLOWED=NO
+
+  security-scan:
+    name: CodeQL Security Scan
+    runs-on: macos-latest
+
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: swift
+          build-mode: manual
+
+      - name: Build App for CodeQL Analysis
+        run: |
+          xcodebuild build \
+            -project TodoList.xcodeproj \
+            -scheme TodoList \
+            -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
